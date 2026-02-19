@@ -59,31 +59,43 @@ smoking = st.sidebar.radio("Smoking", ["No", "Yes"])
 smoking = 1 if smoking == "Yes" else 0
 
 creatinine_phosphokinase = st.sidebar.number_input(
-    "Creatinine Phosphokinase (mcg/L)", 20, 8000, 250
+    "Creatinine Phosphokinase (mcg/L)",
+    min_value=20,
+    max_value=8000,
+    value=250
 )
 
 ejection_fraction = st.sidebar.slider(
-    "Ejection Fraction (%)", 10, 80, 38
+    "Ejection Fraction (%)",
+    10, 80, 38
 )
 
 platelets = st.sidebar.number_input(
-    "Platelets (kiloplatelets/mL)", 100000, 900000, 250000
+    "Platelets (kiloplatelets/mL)",
+    min_value=100000,
+    max_value=900000,
+    value=250000
 )
 
 serum_creatinine = st.sidebar.number_input(
-    "Serum Creatinine (mg/dL)", 0.5, 10.0, 1.2
+    "Serum Creatinine (mg/dL)",
+    min_value=0.5,
+    max_value=10.0,
+    value=1.2
 )
 
 serum_sodium = st.sidebar.slider(
-    "Serum Sodium (mEq/L)", 110, 150, 137
+    "Serum Sodium (mEq/L)",
+    110, 150, 137
 )
 
 time = st.sidebar.slider(
-    "Follow-up Period (days)", 1, 300, 130
+    "Follow-up Period (days)",
+    1, 300, 130
 )
 
 # =============================
-# Input Data
+# Input DataFrame
 # =============================
 input_data = pd.DataFrame([{
     "age": age,

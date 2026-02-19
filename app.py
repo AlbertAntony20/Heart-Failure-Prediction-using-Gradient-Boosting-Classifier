@@ -1,152 +1,106 @@
 import streamlit as st
 import pandas as pd
 import joblib
+import numpy as np
 
-# =============================
-# Page Configuration
-# =============================
-st.set_page_config(
-    page_title="Heart Failure Prediction",
-    page_icon="❤️",
-    layout="centered"
-)
+# --- 1. Load the saved model and transformer ---
+@st.cache_resource # Cache the model and transformer loading
+def load_resources():
+    try:
+        poly_transformer = joblib.load('polynomial_features_transformer.pkl')
+    except FileNotFoundError:
+        st.error("Error: 'polynomial_features_transformer.pkl' not found. Please ensure it's in the same directory.")
+        st.stop()
 
-# =============================
-# Load Model & Transformer
-# =============================
-@st.cache_resource
-def load_artifacts():
-    model = joblib.load("model.pkl")
-    poly = joblib.load("polynomial_features_transformer.pkl")
-    return model, poly
+    try:
+        loaded_gb_model = joblib.load('model.pkl')
+    except FileNotFoundError:
+        st.error("Error: 'model.pkl' not found. Please ensure it's in the same directory.")
+        st.stop()
 
-model, poly = load_artifacts()
+    return poly_transformer, loaded_gb_model
 
-# =============================
-# Title & Description
-# =============================
-st.title("❤️ Heart Failure Prediction System")
+poly_transformer, loaded_gb_model = load_resources()
 
-st.markdown("""
-This application predicts the **risk of heart failure** using a  
-**Gradient Boosting Machine Learning model** optimized for **high recall**.
+# --- 2. Define Optimal Threshold ---
+OPTIMAL_THRESHOLD = 0.25
 
-⚠️ *For educational purposes only. Not a medical diagnosis.*
-""")
+# --- 3. Streamlit App Layout ---
+st.set_page_config(page_title="Heart Disease Event Prediction", layout="centered")
+st.title("❤️ Heart Disease Event Prediction")
+st.markdown("--- ")
+st.markdown("### Enter Patient's Clinical Parameters")
+st.write("Adjust the values below to predict the risk of a heart disease event.")
 
-st.divider()
+# Input Fields Grouped for better UI
+with st.form("prediction_form"):
+    with st.expander("Demographics & Lifestyle", expanded=True):
+        age = st.slider("Age (years)", 40, 100, 60, help="Patient's age in years.")
+        sex = st.selectbox("Sex", [0, 1], format_func=lambda x: "Female" if x == 0 else "Male", help="Biological sex of the patient (0: Female, 1: Male).")
+        smoking = st.selectbox("Smoking", [0, 1], format_func=lambda x: "Yes" if x == 1 else "No", help="Does the patient smoke? (1: Yes, 0: No).")
 
-# =============================
-# Sidebar Inputs
-# =============================
-st.sidebar.header("🧑‍⚕️ Patient Information")
+    with st.expander("Medical Conditions", expanded=True):
+        anaemia = st.selectbox("Anaemia", [0, 1], format_func=lambda x: "Yes" if x == 1 else "No", help="Does the patient have anaemia? (1: Yes, 0: No).")
+        diabetes = st.selectbox("Diabetes", [0, 1], format_func=lambda x: "Yes" if x == 1 else "No", help="Does the patient have diabetes? (1: Yes, 0: No).")
+        high_blood_pressure = st.selectbox("High Blood Pressure", [0, 1], format_func=lambda x: "Yes" if x == 1 else "No", help="Does the patient have high blood pressure? (1: Yes, 0: No).")
 
-age = st.sidebar.slider("Age (years)", 30, 95, 60)
+    with st.expander("Clinical Measurements", expanded=True):
+        creatinine_phosphokinase = st.number_input("Creatinine Phosphokinase (CPK) (mcg/L)", 0, 10000, 250, help="Level of the CPK enzyme in the blood. Higher levels indicate muscle damage.")
+        ejection_fraction = st.slider("Ejection Fraction (%)", 10, 100, 40, help="Percentage of blood leaving the heart at each contraction. Lower values indicate heart failure.")
+        platelets = st.number_input("Platelets (kiloplatelets/mL)", 0, 1000000, 250000, help="Platelets in the blood. Lower values indicate bleeding disorders.")
+        serum_creatinine = st.number_input("Serum Creatinine (mg/dL)", 0.0, 10.0, 1.2, step=0.1, format="%.1f", help="Level of serum creatinine in the blood. Higher values indicate kidney dysfunction.")
+        serum_sodium = st.number_input("Serum Sodium (mEq/L)", 100, 150, 135, help="Level of serum sodium in the blood. Lower values can indicate heart problems.")
 
-sex = st.sidebar.radio("Sex", ["Male", "Female"])
-sex = 1 if sex == "Male" else 0
+    st.markdown("--- ")
+    submit_button = st.form_submit_button("✨ Predict Heart Disease Event ✨")
 
-anaemia = st.sidebar.radio("Anaemia", ["No", "Yes"])
-anaemia = 1 if anaemia == "Yes" else 0
+# --- 4. Prediction Logic ---
+if submit_button:
+    input_data = {
+        'age': age,
+        'anaemia': anaemia,
+        'creatinine_phosphokinase': creatinine_phosphokinase,
+        'diabetes': diabetes,
+        'ejection_fraction': ejection_fraction,
+        'high_blood_pressure': high_blood_pressure,
+        'platelets': platelets,
+        'serum_creatinine': serum_creatinine,
+        'serum_sodium': serum_sodium,
+        'sex': sex,
+        'smoking': smoking
+    }
 
-diabetes = st.sidebar.radio("Diabetes", ["No", "Yes"])
-diabetes = 1 if diabetes == "Yes" else 0
+    # Convert input to DataFrame
+    new_raw_sample = pd.DataFrame([input_data])
 
-high_blood_pressure = st.sidebar.radio("High Blood Pressure", ["No", "Yes"])
-high_blood_pressure = 1 if high_blood_pressure == "Yes" else 0
+    # Apply polynomial feature transformation
+    try:
+        # The poly_transformer was fit on data with the 11 original features
+        original_feature_cols = ['age', 'anaemia', 'creatinine_phosphokinase', 'diabetes', 'ejection_fraction',
+                                 'high_blood_pressure', 'platelets', 'serum_creatinine', 'serum_sodium', 'sex', 'smoking']
+        transformed_features = poly_transformer.transform(new_raw_sample[original_feature_cols])
+    except Exception as e:
+        st.error(f"An error occurred during feature transformation: {e}")
+        st.stop()
 
-smoking = st.sidebar.radio("Smoking", ["No", "Yes"])
-smoking = 1 if smoking == "Yes" else 0
+    # Make prediction (get probabilities)
+    try:
+        prediction_proba = loaded_gb_model.predict_proba(transformed_features)[:, 1]
+        # Apply the optimal threshold
+        final_prediction = (prediction_proba >= OPTIMAL_THRESHOLD).astype(int)[0]
 
-creatinine_phosphokinase = st.sidebar.number_input(
-    "Creatinine Phosphokinase (mcg/L)",
-    min_value=20,
-    max_value=8000,
-    value=250
-)
+        st.subheader("Prediction Result:")
+        if final_prediction == 1:
+            st.error(f"## ⚠️ High Risk of Heart Disease Event! (Probability: {prediction_proba[0]:.2f})")
+            st.write(f"Based on the input parameters and a classification threshold of {OPTIMAL_THRESHOLD}, the model predicts a high likelihood of a heart disease event.")
+            st.info("\nIt is strongly recommended to consult a medical professional for further evaluation and diagnosis.")
+        else:
+            st.success(f"## ✅ Low Risk of Heart Disease Event (Probability: {prediction_proba[0]:.2f})")
+            st.write(f"Based on the input parameters and a classification threshold of {OPTIMAL_THRESHOLD}, the model predicts a low likelihood of a heart disease event.")
+            st.info("\nWhile the risk is low, continuous monitoring and regular check-ups are always advisable for heart health.")
 
-ejection_fraction = st.sidebar.slider(
-    "Ejection Fraction (%)",
-    10, 80, 38
-)
+        st.markdown("--- ")
+        st.warning("**Disclaimer:** This prediction is generated by an AI model and is for informational purposes only. It should not be considered medical advice or a substitute for professional medical consultation, diagnosis, or treatment. Always seek the advice of your physician or other qualified health provider with any questions you may have regarding a medical condition.")
 
-platelets = st.sidebar.number_input(
-    "Platelets (kiloplatelets/mL)",
-    min_value=100000,
-    max_value=900000,
-    value=250000
-)
-
-serum_creatinine = st.sidebar.number_input(
-    "Serum Creatinine (mg/dL)",
-    min_value=0.5,
-    max_value=10.0,
-    value=1.2
-)
-
-serum_sodium = st.sidebar.slider(
-    "Serum Sodium (mEq/L)",
-    110, 150, 137
-)
-
-time = st.sidebar.slider(
-    "Follow-up Period (days)",
-    1, 300, 130
-)
-
-# =============================
-# Input DataFrame
-# =============================
-input_data = pd.DataFrame([{
-    "age": age,
-    "anaemia": anaemia,
-    "creatinine_phosphokinase": creatinine_phosphokinase,
-    "diabetes": diabetes,
-    "ejection_fraction": ejection_fraction,
-    "high_blood_pressure": high_blood_pressure,
-    "platelets": platelets,
-    "serum_creatinine": serum_creatinine,
-    "serum_sodium": serum_sodium,
-    "sex": sex,
-    "smoking": smoking,
-    "time": time
-}])
-
-st.subheader("📋 Patient Data Summary")
-st.dataframe(input_data, use_container_width=True)
-
-# =============================
-# Prediction
-# =============================
-if st.button("🔍 Predict Heart Failure Risk"):
-    input_poly = poly.transform(input_data)
-    probability = model.predict_proba(input_poly)[0][1]
-
-    threshold = 0.25
-    prediction = 1 if probability >= threshold else 0
-
-    st.divider()
-    st.subheader("📊 Prediction Result")
-
-    st.metric(
-        label="Predicted Risk Probability",
-        value=f"{probability * 100:.2f}%"
-    )
-
-    if prediction == 1:
-        st.error(
-            "⚠️ **High Risk of Heart Failure Detected**\n\n"
-            "Please consult a qualified healthcare professional."
-        )
-    else:
-        st.success(
-            "✅ **Low Risk of Heart Failure Detected**"
-        )
-
-# =============================
-# Footer
-# =============================
-st.divider()
-st.caption(
-    "Developed by **Albert Antony S** | Heart Failure Prediction (ML Project)"
-)
+    except Exception as e:
+        st.error(f"An error occurred during model prediction: {e}")

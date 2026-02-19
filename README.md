@@ -79,6 +79,6 @@ Distributed under the MIT License. See `LICENSE` for more information.
 
 ## Contact
 
-Albert Antony S - [your_email@example.com](mailto:your_email@example.com)
+Albert Antony S - [albertantony1820@gmail.com](mailto:albertantony1820@gmail.com)
 
 Project Link: [https://github.com/your_username/your_project](https://github.com/your_username/your_project)

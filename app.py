@@ -52,7 +52,7 @@ with st.form("prediction_form"):
         serum_sodium = st.number_input("Serum Sodium (mEq/L)", 100, 150, 135, help="Level of serum sodium in the blood. Lower values can indicate heart problems.")
 
     st.markdown("--- ")
-    submit_button = st.form_submit_button("✨ Predict Heart Disease Event ✨")
+    submit_button = st.form_submit_button(" Predict Heart Disease ")
 
 # --- 4. Prediction Logic ---
 if submit_button:

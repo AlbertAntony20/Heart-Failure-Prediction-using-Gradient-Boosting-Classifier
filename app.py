@@ -35,7 +35,7 @@ st.write("Adjust the values below to predict the risk of a heart disease event."
 # Input Fields Grouped for better UI
 with st.form("prediction_form"):
     with st.expander("Demographics & Lifestyle", expanded=True):
-        age = st.slider("Age (years)", 40, 100, 60, help="Patient's age in years.")
+        age = st.slider("Age (years)", 1, 100, 60, help="Patient's age in years.")
         sex = st.selectbox("Sex", [0, 1], format_func=lambda x: "Female" if x == 0 else "Male", help="Biological sex of the patient (0: Female, 1: Male).")
         smoking = st.selectbox("Smoking", [0, 1], format_func=lambda x: "Yes" if x == 1 else "No", help="Does the patient smoke? (1: Yes, 0: No).")
 

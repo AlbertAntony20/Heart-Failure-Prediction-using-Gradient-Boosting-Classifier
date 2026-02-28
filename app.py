@@ -91,11 +91,11 @@ if submit_button:
 
         st.subheader("Prediction Result:")
         if final_prediction == 1:
-            st.error(f"## ⚠️ High Risk of Heart Disease Event! (Probability: {prediction_proba[0]:.2f})")
+            st.error(f"## ⚠️ High Risk of Heart Disease Event!")
             st.write(f"Based on the input parameters and a classification threshold of {OPTIMAL_THRESHOLD}, the model predicts a high likelihood of a heart disease event.")
             st.info("It is strongly recommended to consult a medical professional for further evaluation and diagnosis.")
         else:
-            st.success(f"## ✅ Low Risk of Heart Disease Event (Probability: {prediction_proba[0]:.2f})")
+            st.success(f"## ✅ Low Risk of Heart Disease Event")
             st.write(f"Based on the input parameters and a classification threshold of {OPTIMAL_THRESHOLD}, the model predicts a low likelihood of a heart disease event.")
             st.info("While the risk is low, continuous monitoring and regular check-ups are always advisable for heart health.")
 

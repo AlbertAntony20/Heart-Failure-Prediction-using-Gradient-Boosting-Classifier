@@ -104,3 +104,20 @@ if submit_button:
 
     except Exception as e:
         st.error(f"An error occurred during model prediction: {e}")
+# Team Crredits
+
+with st.expander("ℹ️ About the Project & Team"):
+    st.write("""
+    This Heart Failure Risk Prediction tool uses a Gradient Boosting model 
+    enhanced with Polynomial Features to identify clinical risk factors.
+    """)
+    
+    col1, col2 = st.columns(2)
+    with col1:
+        st.markdown("**Project Lead**")
+        st.write("[Albert Antony S](https://linkedin.com/in/albertantonys)")
+    with col2:
+        st.markdown("**Collaborators**")
+        st.write("Jeevanesh K")
+        st.write("Kumaran M")
+        st.write("Elaichandiran S")

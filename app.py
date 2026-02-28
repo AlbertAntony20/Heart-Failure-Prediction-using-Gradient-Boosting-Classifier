@@ -27,7 +27,7 @@ OPTIMAL_THRESHOLD = 0.25
 
 # --- 3. Streamlit App Layout ---
 st.set_page_config(page_title="Heart Failure Risk Prediction", layout="centered")
-st.title("❤️ Heart Failure Risk Prediction")
+st.title("❤️ Heart Failure Risk Prediction 🩺")
 st.markdown("--- ")
 st.markdown("### Enter Patient's Clinical Parameters")
 st.write("Adjust the values below to predict the risk of a heart disease event.")

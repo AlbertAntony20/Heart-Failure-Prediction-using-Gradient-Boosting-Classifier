@@ -1,5 +1,5 @@
 
-# Heart Disease Prediction Model
+# Heart Failure Prediction Model
 
 A machine learning model to predict heart disease events, optimized for high recall in medical diagnosis.
 
@@ -81,4 +81,4 @@ Distributed under the MIT License. See `LICENSE` for more information.
 
 Albert Antony S - [albertantony1820@gmail.com](mailto:albertantony1820@gmail.com)
 
-Project Link: [https://github.com/AlbertAntony20/Heart-Failure-Prediction-using-Gradient-Boosting-Classifier/tree/main](https://github.com/AlbertAntony20/Heart-Failure-Prediction-using-Gradient-Boosting-Classifier/tree/main)
+Project Link: [Heart-Failure-Prediction-using-Gradient-Boosting-Classifier](https://github.com/AlbertAntony20/Heart-Failure-Prediction-using-Gradient-Boosting-Classifier/tree/main)

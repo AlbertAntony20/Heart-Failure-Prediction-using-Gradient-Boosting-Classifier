@@ -81,4 +81,4 @@ Distributed under the MIT License. See `LICENSE` for more information.
 
 Albert Antony S - [albertantony1820@gmail.com](mailto:albertantony1820@gmail.com)
 
-Project Link: [https://github.com/your_username/your_project](https://github.com/your_username/your_project)
+Project Link: [https://github.com/AlbertAntony20/Heart-Failure-Prediction-using-Gradient-Boosting-Classifier/tree/main](https://github.com/AlbertAntony20/Heart-Failure-Prediction-using-Gradient-Boosting-Classifier/tree/main)

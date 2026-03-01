@@ -71,7 +71,7 @@ After ensuring `model.pkl` and `polynomial_features_transformer.pkl` are in the 
 streamlit run app.py
 ```
 
-This will launch a web application where you can input patient parameters and get predictions. The application uses the **Gradient Boosting Classifier** trained with polynomial features and applies an **adjusted classification threshold of 0.25** to prioritize recall, which is critical for identifying heart disease events.
+This will launch a web application where you can input patient parameters and get predictions. The application uses the **Gradient Boosting Classifier** trained with polynomial features and applies an **adjusted classification threshold of 0.25** to prioritize recall, which is critical for identifying heart failure events.
 
 ## License
 

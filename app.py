@@ -119,5 +119,3 @@ with st.expander("ℹ️ About the Project & Team"):
     with col2:
         st.markdown("**Collaborators**")
         st.write("Jeevanesh K")
-        st.write("Kumaran M")
-        st.write("Elaichandiran S")

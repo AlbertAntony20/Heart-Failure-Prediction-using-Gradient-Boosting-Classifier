@@ -118,4 +118,7 @@ with st.expander("ℹ️ About the Project & Team"):
         st.write("[Albert Antony S](https://linkedin.com/in/albertantonys)")
     with col2:
         st.markdown("**Collaborators**")
-        st.write("Jeevanesh K")
+        st.write("Mohamed Imran M.E")
+        st.write("Mugeshwaran S")
+        st.write("Sudharsan S")
+        st.write("Kaviprasath K")
